@@ -17,34 +17,32 @@ var UserSchema = new mongoose.Schema(
     },
     bio: String,
     nameCardImage: String,
-    hash: String
+    hash: String,
+    addresses: [String],
+    phoneNumbers: [String]
   },
   { timestamps: true }
 );
 
 UserSchema.plugin(uniqueValidator, { message: "is already taken." });
 
-UserSchema.methods.setPassword = function(password, cb) {
-  let user = this;
-  bcrypt.hash(password, saltRounds, function(err, hash) {
-    if (err) return cb(err, null);
-    user.hash = hash;
-    return cb(null, hash);
-  });
+UserSchema.methods.setPassword = function(password) {
+  return new Promise((resolve, reject)  => {
+    bcrypt.hash(password, saltRounds, (err, hash) => {
+      if (err) return reject(err);
+      this.hash = hash;
+      resolve(hash)
+    });
+  })
 };
 
 UserSchema.methods.validPassword = function(password) {
-  return new Promise(async function(resolve, reject) {
-    bcrypt
-      .compare(password, this.hash)
-      .then(function(res) {
-        if (res) return resolve(true);
-        return reject(false);
-      })
-      .catch(err => {
-        return reject(err);
-      });
-  });
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, this.hash, (err, res) => {
+      if (err) return reject(err);
+      return resolve(res)
+    })
+  })
 };
 
 module.exports.User = mongoose.model("User", UserSchema);
