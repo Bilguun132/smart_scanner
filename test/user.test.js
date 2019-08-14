@@ -29,13 +29,40 @@ describe("User Model Methods", () => {
 });
 
 describe("api/users", () => {
-  before(async () => {
+  beforeEach(async () => {
     await User.remove({});
   });
-  after(async () => {
+  afterEach(async () => {
     await User.remove({});
   });
-  describe("POST", () => {
+
+  describe.only("GET /", () => {
+    let id = "";
+    before(async () => {
+      console.log("before");
+      let users = await User.insertMany([
+        {
+          name: "Bilguun",
+          email: "test@gmail.com"
+        },
+        {
+          name: "Bilguun",
+          email: "test@gmail.com"
+        }
+      ]);
+      console.log(users);
+    });
+
+    it("should return all users when requested", async () => {
+      let users = await User.find({});
+      console.log(users);
+      let res = await request(app).get("/api/users");
+      expect(res.status).to.equal(200);
+      expect(res.body).length.to.equal(2);
+    });
+  });
+
+  describe("POST /", () => {
     it("should create a new user when valid post request is made", async () => {
       let user = {
         name: "Bilguun",
@@ -70,8 +97,27 @@ describe("api/users", () => {
       let res = await request(app)
         .post("/api/users")
         .send(user);
-      console.log(res.text)
       expect(res.status).to.not.equal(200);
-    })
+    });
+  });
+
+  describe("POST /login", () => {
+    it("should return user when the login credentials are correct", async () => {
+      let user = new User({
+        name: "Bilguun",
+        email: "Bilguun132@gmail.com"
+      });
+      await user.setPassword("testpassword");
+      console.log(user);
+      console.log("saving");
+      await user.save();
+      console.log("saved");
+
+      let res = await request(app)
+        .post("/api/users/login")
+        .send({ email: "Bilguun132@gmail.com", password: "testpassword" });
+      // console.log(res);
+      expect(res.status).to.equal(200);
+    });
   });
 });
