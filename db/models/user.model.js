@@ -38,7 +38,6 @@ UserSchema.methods.setPassword = function(password) {
 };
 
 UserSchema.methods.validPassword = function(password) {
-  console.log(this.hash);
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, this.hash, (err, res) => {
       if (err) return reject(err);

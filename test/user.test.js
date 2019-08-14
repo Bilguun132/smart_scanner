@@ -2,6 +2,7 @@ const { User } = require("../db/models/user.model");
 const request = require("supertest");
 var expect = require("chai").expect;
 var app = require("../app");
+var debug = require("debug")("smartscanner:user.test");
 
 describe("User Model Methods", () => {
   describe("password", () => {
@@ -29,18 +30,16 @@ describe("User Model Methods", () => {
 });
 
 describe("api/users", () => {
-  beforeEach(async () => {
+  before(async () => {
     await User.remove({});
   });
-  afterEach(async () => {
+  after(async () => {
     await User.remove({});
   });
 
-  describe.only("GET /", () => {
-    let id = "";
+  describe("GET /", () => {
     before(async () => {
-      console.log("before");
-      let users = await User.insertMany([
+      await User.insertMany([
         {
           name: "Bilguun",
           email: "test@gmail.com"
@@ -50,39 +49,69 @@ describe("api/users", () => {
           email: "test@gmail.com"
         }
       ]);
-      console.log(users);
     });
 
     it("should return all users when requested", async () => {
-      let users = await User.find({});
-      console.log(users);
-      let res = await request(app).get("/api/users");
-      expect(res.status).to.equal(200);
-      expect(res.body).length.to.equal(2);
+      User.find()
+        .then(async users => {
+          let res = await request(app).get("/api/users");
+          expect(res.status).to.equal(200);
+          expect(res.body).length.to.equal(2);
+        })
+        .catch(err => {
+          debug(err);
+        });
     });
+  });
+
+  describe("GET /id", () => {
+    let user;
+    before(async () => {
+      user = new User({
+        name: "Test",
+        email: "test@gmail.com"
+      });
+      await user.save();
+    });
+
+    it("should return a users when requested with valid id", async () => {
+      let res = await request(app).get("/api/users/" + user._id);
+      expect(res.status).to.equal(200);
+      expect(res.body).to.have.property("name");
+    });
+
+    it("should return error when invalid id is requested", async () => {
+      let res = await request(app).get("/api/users/" + 111);
+      expect(res.status).to.not.equal(200);
+      expect(res.body).to.have.property("message");
+    });
+
+    it("should return 404 when valid id but non existent user is requested", async () => {
+      let res = await request(app).get("/api/users/" + 111111111111)
+      expect(res.status).to.equal(404);
+    })
   });
 
   describe("POST /", () => {
     it("should create a new user when valid post request is made", async () => {
       let user = {
         name: "Bilguun",
-        email: "Bilguun132@gmail.com"
+        email: "Bilguun132@gmail.com",
+        password: "test"
       };
       let res = await request(app)
         .post("/api/users")
         .send(user);
       expect(res.status).to.equal(200);
+      expect(res.body).to.have.property("hash");
     });
 
     it("should return 400 when duplicate user email is used", async () => {
-      let user = {
+      let user = new User({
         name: "Bilguun",
         email: "Bilguun132@gmail.com"
-      };
-
-      await request(app)
-        .post("/api/users")
-        .send(user);
+      });
+      await user.save();
       let res = await request(app)
         .post("/api/users")
         .send(user);
@@ -108,16 +137,50 @@ describe("api/users", () => {
         email: "Bilguun132@gmail.com"
       });
       await user.setPassword("testpassword");
-      console.log(user);
-      console.log("saving");
       await user.save();
-      console.log("saved");
 
       let res = await request(app)
         .post("/api/users/login")
         .send({ email: "Bilguun132@gmail.com", password: "testpassword" });
-      // console.log(res);
       expect(res.status).to.equal(200);
+    });
+
+    it("should return error when email does not exist", async () => {
+      let res = await request(app)
+        .post("/api/users/login")
+        .send({ email: "123123213@gmail.com", password: "testpassword" });
+      expect(res.status).to.not.equal(200);
+    });
+  });
+
+  describe("POST /addCard", () => {
+    let user;
+    before(async () => {
+      user = new User({
+        name: "Bilguun",
+        email: "Bilguun132@gmail.com"
+      });
+      await user.setPassword("testpassword");
+      await user.save();
+    });
+    it("should return a success result when a valid card is added", async () => {
+      let card = {
+        name: "bilguun",
+        emails: ["bilguun132@gmail.com"],
+        notes: "none",
+        image: "image data"
+      };
+      let data = {
+        card: card,
+        id: user._id
+      };
+      let res = await request(app)
+        .post("/api/users/addCard")
+        .send(data);
+      expect(res.status).to.equal(200);
+      let updatedUser = await User.findById(user._id);
+      expect(updatedUser.cards).to.be.an("array");
+      expect(updatedUser.cards.length).to.equal(1);
     });
   });
 });

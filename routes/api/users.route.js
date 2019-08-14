@@ -11,5 +11,6 @@ router
 
 router.route("/:id").get(userController.getUser);
 router.post("/login", userController.loginUser);
+router.post("/addCard", userController.addCard)
 
 module.exports = router;

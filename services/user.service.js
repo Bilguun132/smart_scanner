@@ -13,10 +13,17 @@ module.exports.createUser = async newUser => {
     if (user) return reject({ status: 400, message: "User exists." });
 
     user = new User(newUser);
-    user.save(async err => {
-      if (err) return reject({ status: 500, message: err });
-      return resolve(user);
-    });
+    user
+      .setPassword(newUser.password)
+      .then(() => {
+        user.save(async err => {
+          if (err) return reject({ status: 500, message: err });
+          return resolve(user);
+        });
+      })
+      .catch(err => {
+        return reject({ status: 500, message: err });
+      });
   });
 };
 
@@ -32,8 +39,6 @@ module.exports.loginUser = async (email, password) => {
         status: 400,
         message: "User does not exist or invalid password"
       });
-
-    console.log(user);
     user
       .validPassword(password)
       .then(res => {
@@ -77,7 +82,7 @@ module.exports.getUser = async id => {
 };
 
 /**
- * @param {object} card - new card object
+ * @param {JSON} card - new card object
  * @param {string} id - user id
  */
 module.exports.addCard = async (card, id) => {
@@ -89,7 +94,7 @@ module.exports.addCard = async (card, id) => {
       .then(async card => {
         user.cards.push(card._id);
         await user.save();
-        return resolve(user);
+        return resolve({ status: 200, message: "Card add success" });
       })
       .catch(err => {
         reject({ status: 500, message: err });

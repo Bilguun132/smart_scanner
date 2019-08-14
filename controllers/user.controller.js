@@ -43,4 +43,14 @@ module.exports.loginUser = async (req, res) => {
     });
 };
 
-module.exports.addCard = async (req, res) => {};
+module.exports.addCard = async (req, res) => {
+  let card = req.body.card;
+  let id = req.body.id;
+  UserService.addCard(card, id)
+    .then(result => {
+      res.send(result);
+    })
+    .catch(err => {
+      res.status(err.status).send(err);
+    });
+};
