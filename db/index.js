@@ -1,6 +1,5 @@
 var debug = require("debug")("smartscanner:db");
 var mongoose = require("mongoose");
-const { User } = require("../db/models/user.model");
 
 module.exports = function() {
   const db = process.env.DB;

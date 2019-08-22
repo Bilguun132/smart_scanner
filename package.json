@@ -10,6 +10,7 @@
     "test:coverage": "nyc --reporter=html mocha --exit"
   },
   "dependencies": {
+    "amqplib": "^0.5.5",
     "bcrypt": "^3.0.6",
     "chai": "^4.2.0",
     "cookie-parser": "~1.4.4",

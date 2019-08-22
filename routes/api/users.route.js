@@ -11,6 +11,8 @@ router
 
 router.route("/:id").get(userController.getUser);
 router.post("/login", userController.loginUser);
-router.post("/addCard", userController.addCard)
+router.post("/addCard", userController.addCard);
+router.post("/publishToQueue", userController.publishToQueue);
+router.post("/linkedinScraperResults", userController.linkedinScraperResults);
 
 module.exports = router;
