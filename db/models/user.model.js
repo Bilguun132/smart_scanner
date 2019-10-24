@@ -1,6 +1,5 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require("mongoose-unique-validator");
-var bcrypt = require("bcrypt");
 var debug = require("debug")("smartscanner:user.model");
 
 const saltRounds = 10;
@@ -29,20 +28,20 @@ UserSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 UserSchema.methods.setPassword = function(password) {
   return new Promise((resolve, reject) => {
-    bcrypt.hash(password, saltRounds, (err, hash) => {
-      if (err) return reject(err);
-      this.hash = hash;
-      resolve(hash);
-    });
+    // bcrypt.hash(password, saltRounds, (err, hash) => {
+    //   if (err) return reject(err);
+    //   this.hash = hash;
+    //   resolve(hash);
+    // });
   });
 };
 
 UserSchema.methods.validPassword = function(password) {
   return new Promise((resolve, reject) => {
-    bcrypt.compare(password, this.hash, (err, res) => {
-      if (err) return reject(err);
-      return resolve(res);
-    });
+    // bcrypt.compare(password, this.hash, (err, res) => {
+    //   if (err) return reject(err);
+    //   return resolve(res);
+    // });
   });
 };
 
