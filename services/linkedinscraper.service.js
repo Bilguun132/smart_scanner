@@ -10,8 +10,9 @@ amqp.connect(CONN_URL, function (err, conn) {
 });
 
 const publishToQueue = async (queueName, data) => {
-   console.log(queueName)
-   console.log(data)
+   ch.assertQueue(queueName, {
+      durable: false
+    });
    ch.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));
    console.log(" [x] Sent %s", data);
 }

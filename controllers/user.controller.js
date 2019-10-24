@@ -1,5 +1,5 @@
 const UserService = require("../services/user.service");
-const LinkedInScraperService = require("../services/linkedinscraper.service");
+// const LinkedInScraperService = require("../services/linkedinscraper.service");
 
 module.exports.getUser = async (req, res) => {
   UserService.getUser(req.params.id)
@@ -56,20 +56,26 @@ module.exports.addCard = async (req, res) => {
     });
 };
 
-module.exports.publishToQueue = async (req, res) => {
-  let id = req.body.id;
-  let query = req.body.query;
-  let tnxId = "qweqweqwe";
-  let data = {
-    id,
-    query,
-    tnxId
-  };
-  LinkedInScraperService.publishToQueue("linkedinscraper", data);
-  res.send("success");
-};
+// module.exports.publishToQueue = async (req, res) => {
+//   let id = req.body.id;
+//   let query = req.body.query;
+//   let tnxId = "qweqweqwe";
+//   let fullName = req.body.fullName;
+//   let resultsUrl = 'http://localhost:3000/api/users/linkedinScraperResults'
+//   let data = {
+//     id,
+//     query,
+//     tnxId,
+//     resultsUrl,
+//     fullName
+//   };
+//   LinkedInScraperService.publishToQueue("linkedinscraper", data);
+//   res.send("success");
+// };
 
-module.exports.linkedinScraperResults = async (req, res) => {
-  console.log(req.body);
-  res.send("success");
-};
+// module.exports.linkedinScraperResults = async (req, res) => {
+//   console.log(req.body);
+//   let results = req.body.result;
+//   console.log('results found is ', results.length)
+//   res.send("success");
+// };

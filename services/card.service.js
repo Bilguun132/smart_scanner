@@ -8,6 +8,7 @@ const { Card } = require("../db/models/card.model");
 
 module.exports.createCard = async newCard => {
   return new Promise(async (resolve, reject) => {
+    delete newCard["_id"];
     let card = new Card(newCard);
     card.save(async err => {
       if (err) return reject({ status: 500, message: err });
