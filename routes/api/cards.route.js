@@ -17,7 +17,12 @@ var upload = multer({ storage: storage });
 /* GET users listing. */
 
 router.get("/", cardController.getAllCards);
-router.post("/image", upload.single("namecard"), cardController.createCardWithImage);
+router.get("/count", cardController.getCardCount);
+router.post(
+  "/image",
+  upload.single("namecard"),
+  cardController.createCardWithImage
+);
 router.post("/imagestring", cardController.createCardWithImageString);
 
 module.exports = router;

@@ -36,3 +36,15 @@ module.exports.createCard = async newCard => {
     });
   });
 };
+
+module.exports.getCardCount = async () => {
+  return new Promise(async (resolve, reject) => {
+    Card.countDocuments()
+      .then(number => {
+        return resolve(number);
+      })
+      .catch(err => {
+        return reject({ status: 500, message: err });
+      });
+  });
+};

@@ -1,6 +1,10 @@
 const CardService = require("../services/card.service");
 var debug = require("debug")("smartscanner:cardController");
 
+/**
+ * @param req - containing page size and page number
+ *
+ */
 module.exports.getAllCards = async (req, res) => {
   let pageNum = req.query.PageNum;
   debug("Page Number is", pageNum);
@@ -12,11 +16,32 @@ module.exports.getAllCards = async (req, res) => {
   if (pageSize == null || pageSize == undefined) {
     pageSize = 20;
   }
+  // increase page size by 1 to see if there is additional items
+  pageSize += 1;
   let skip = (pageNum - 1) * pageSize;
 
   CardService.getCards(skip, pageSize)
     .then(cards => {
-      res.send(cards);
+      let result = {};
+      if (cards.length > 20) {
+        cards = cards.pop();
+        result.hasNext = true;
+      } else {
+        result.hasNext = false;
+      }
+      result.cards = cards;
+
+      res.send(result);
+    })
+    .catch(err => {
+      res.status(err.status).send(err);
+    });
+};
+
+module.exports.getCardCount = async (req, res) => {
+  CardService.getCardCount()
+    .then(count => {
+      return res.send({ count: count });
     })
     .catch(err => {
       res.status(err.status).send(err);
