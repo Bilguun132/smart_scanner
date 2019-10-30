@@ -14,7 +14,8 @@ var CardSchema = new mongoose.Schema(
     imageString: String,
     addresses: [String],
     phoneNumbers: [String],
-    companies: [String]
+    company: String,
+    companyBoundingBox: [String]
   },
   { timestamps: true }
 );

@@ -64,7 +64,7 @@ module.exports.createCardWithImage = async (req, res) => {
 };
 
 module.exports.createCardWithImageString = async (req, res) => {
-  let card = req.body;
+  let card = req.body;  
   CardService.createCard(card)
     .then(result => {
       res.send(result);

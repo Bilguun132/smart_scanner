@@ -29,7 +29,15 @@ module.exports.getCards = async (skip, limit) => {
 module.exports.createCard = async newCard => {
   return new Promise(async (resolve, reject) => {
     delete newCard["_id"];
-    let card = new Card(newCard);
+    let card = await Card.findOne({
+      name: newCard.name,
+      title: newCard.title,
+      company: newCard.company
+    });
+    if (card != null || card != undefined) {
+      return reject({ status: 422, errorMessage: "Record already exists" });
+    }
+    card = new Card(newCard);
     card.save(async err => {
       if (err) return reject({ status: 500, message: err });
       return resolve(card);
