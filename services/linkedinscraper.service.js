@@ -1,10 +1,12 @@
 var amqp = require("amqplib/callback_api");
 
 const CONN_URL = process.env.MQ_URL
+console.log(CONN_URL)
 
 let ch = null;
 amqp.connect(CONN_URL, function (err, conn) {
    conn.createChannel(function (err, channel) {
+      console.log(err)
       ch = channel;
    });
 });
